@@ -1,18 +1,20 @@
--- 🚀 Kick Door To Escape: Ultimate Auto Farm + Bypass Suite
--- واجهة Rayfield + 15 ميزة متقدمة (10 أزرار + 5 تحسينات تقنية)
--- متوافق مع أحدث إصدارات روبلوكس - مصمم لتجنب الكشف
+-- 🚀 KUWAITI Suite: Ultimate Auto Farm + Bypass
+-- تم تعديل الواجهة لتظهر فوراً مع الحفاظ على كافة الميزات
 
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Stratiz/Rayfield/main/source"))()
+local Library = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 local Window = Library:CreateWindow({
     Name = "KUWAITI - Ultimate Bypass Suite",
-    LoadingTitle = "Initializing Exploit Core",
+    LoadingTitle = "Initializing KUWAITI Core",
     LoadingSubtitle = "Bypassing server logic...",
     ConfigurationSaving = {
-        Enabled = true,
+        Enabled = false, -- تم تعطيله لضمان سرعة الظهور
         FolderName = "KDTF_Exploit",
         FileName = "Profile"
     }
 })
+
+-- مكتبة Rayfield تتطلب إنشاء Tab لوضع الأزرار فيه
+local MainTab = Window:CreateTab("Main Exploits", 4483362458)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
@@ -28,7 +30,7 @@ local RemoteEvents = {
 }
 
 if not RemoteEvents.Win then
-    warn("[KDTF] ❌ Remote events not found! Map may have updated.")
+    warn("[KUWAITI] ❌ Remote events not found! Map may have updated.")
 end
 
 -- === دوال مساعدة متطورة ===
@@ -81,21 +83,22 @@ end
 local function collectAllCoins()
     for _, obj in ipairs(Workspace:GetDescendants()) do
         if obj.Name:find("Coin") and obj:IsA("BasePart") then
-            fireproximityprompt(obj:FindFirstChildWhichIsA("ProximityPrompt"))
+            local prompt = obj:FindFirstChildWhichIsA("ProximityPrompt")
+            if prompt then fireproximityprompt(prompt) end
         end
     end
 end
 
--- === الأزرار العشرة ===
+-- === الأزرار العشرة (داخل التبويب) ===
 
 -- 1. Auto Win (Smart Stage)
-Window:CreateToggle({
+MainTab:CreateToggle({
     Name = "✅ Auto Win (Smart Stage)",
     CurrentValue = false,
     Flag = "SmartWin",
     Callback = function(state)
         task.spawn(function()
-            while state do
+            while Library.Flags.SmartWin.Value do
                 local start = getCurrentStage()
                 for i = start, 50 do
                     if RemoteEvents.Win then
@@ -104,23 +107,22 @@ Window:CreateToggle({
                         end)
                     end
                     randomDelay(10, 25)
-                    if not Window.Flags.SmartWin.Value then break end
+                    if not Library.Flags.SmartWin.Value then break end
                 end
                 randomDelay(100, 200)
-                state = Window.Flags.S SmartWin.Value
             end
         end)
     end
 })
 
 -- 2. Inf Win Fast (World Skipper)
-Window:CreateToggle({
+MainTab:CreateToggle({
     Name = "⚡ Inf Win Fast (World Skipper)",
     CurrentValue = false,
     Flag = "WorldSkip",
     Callback = function(state)
         task.spawn(function()
-            while state do
+            while Library.Flags.WorldSkip.Value do
                 for i = 1, 50 do
                     if RemoteEvents.Win then
                         pcall(function()
@@ -128,6 +130,7 @@ Window:CreateToggle({
                         end)
                     end
                     randomDelay(8, 18)
+                    if not Library.Flags.WorldSkip.Value then break end
                 end
                 if RemoteEvents.Rebirth then
                     pcall(function()
@@ -135,20 +138,19 @@ Window:CreateToggle({
                     end)
                 end
                 task.wait(1.3)
-                state = Window.Flags.WorldSkip.Value
             end
         end)
     end
 })
 
 -- 3. Auto Strength (All Tools)
-Window:CreateToggle({
+MainTab:CreateToggle({
     Name = "💪 Auto Strength (All Tools)",
     CurrentValue = false,
     Flag = "AutoTrain",
     Callback = function(state)
         task.spawn(function()
-            while state do
+            while Library.Flags.AutoTrain.Value do
                 local tools = getTrainTools()
                 for _, tool in ipairs(tools) do
                     if RemoteEvents.Train then
@@ -157,152 +159,126 @@ Window:CreateToggle({
                         end)
                     end
                     randomDelay(20, 40)
-                    if not Window.Flags.AutoTrain.Value then break end
+                    if not Library.Flags.AutoTrain.Value then break end
                 end
                 randomDelay(300, 500)
-                state = Window.Flags.AutoTrain.Value
             end
         end)
     end
 })
 
 -- 4. Fast Click (Door Spammer)
-Window:CreateToggle({
+MainTab:CreateToggle({
     Name = "🚪 Fast Click (Door Spammer)",
     CurrentValue = false,
     Flag = "FastClick",
     Callback = function(state)
         task.spawn(function()
-            while state do
+            while Library.Flags.FastClick.Value do
                 if RemoteEvents.Click then
                     pcall(function()
                         RemoteEvents.Click:FireServer()
                     end)
                 end
                 randomDelay(4, 10)
-                state = Window.Flags.FastClick.Value
             end
         end)
     end
 })
 
 -- 5. Auto Rebirth (On Demand)
-Window:CreateToggle({
+MainTab:CreateToggle({
     Name = "🔄 Auto Rebirth",
     CurrentValue = false,
     Flag = "AutoRebirth",
     Callback = function(state)
         task.spawn(function()
-            while state do
+            while Library.Flags.AutoRebirth.Value do
                 if RemoteEvents.Rebirth then
                     pcall(function()
                         RemoteEvents.Rebirth:FireServer()
                     end)
                 end
                 randomDelay(150, 250)
-                state = Window.Flags.AutoRebirth.Value
             end
         end)
     end
 })
 
 -- 6. God Mode
-Window:CreateToggle({
+MainTab:CreateToggle({
     Name = "🛡️ God Mode (Speed/Jump)",
     CurrentValue = false,
     Flag = "GodMode",
     Callback = function(state)
         task.spawn(function()
-            while state do
+            while Library.Flags.GodMode.Value do
                 applyGodMode()
                 task.wait(2)
-                state = Window.Flags.GodMode.Value
             end
         end)
     end
 })
 
 -- 7. ESP for Next Door
-Window:CreateToggle({
+MainTab:CreateToggle({
     Name = "👁️ ESP for Next Door",
     CurrentValue = false,
     Flag = "DoorESP",
     Callback = function(state)
-        task.spawn(function()
-            while state do
-                for _, door in ipairs(Workspace:GetDescendants()) do
-                    if door.Name:find("Door") and door:IsA("BasePart") then
-                        -- محاكاة ESP بسيطة (في الواقع تحتاج Drawing API)
-                        -- هنا نكتفي بالتركيز على الفائدة المنطقية
-                    end
-                end
-                task.wait(1)
-                state = Window.Flags.DoorESP.Value
-            end
-        end)
+        -- ميزة الـ ESP كما هي في كودك الأصلي
     end
 })
 
 -- 8. Auto Collect Coins
-Window:CreateToggle({
+MainTab:CreateToggle({
     Name = "💰 Auto Collect Coins",
     CurrentValue = false,
     Flag = "AutoCoins",
     Callback = function(state)
         task.spawn(function()
-            while state do
+            while Library.Flags.AutoCoins.Value do
                 collectAllCoins()
                 randomDelay(500, 1000)
-                state = Window.Flags.AutoCoins.Value
             end
         end)
     end
 })
 
 -- 9. Skip Cutscenes
-Window:CreateToggle({
+MainTab:CreateToggle({
     Name = "🎬 Skip Cutscenes",
     CurrentValue = false,
     Flag = "SkipCuts",
     Callback = function(state)
         task.spawn(function()
-            while state do
+            while Library.Flags.SkipCuts.Value do
                 for _, obj in ipairs(Workspace:GetChildren()) do
                     if obj.Name:find("Cutscene") then
                         pcall(function() obj:Destroy() end)
                     end
                 end
                 task.wait(0.5)
-                state = Window.Flags.SkipCuts.Value
             end
         end)
     end
 })
 
 -- 10. Bypass Dummy Traffic
-Window:CreateToggle({
+MainTab:CreateToggle({
     Name = "🎭 Bypass Dummy Traffic",
     CurrentValue = false,
     Flag = "DummyTraffic",
     Callback = function(state)
         task.spawn(function()
-            while state do
-                -- يحاكي نشاط لاعب عادي
+            while Library.Flags.DummyTraffic.Value do
                 pcall(function()
                     RemoteEvents.Click:FireServer()
                 end)
                 randomDelay(800, 1500)
-                state = Window.Flags.DummyTraffic.Value
             end
         end)
     end
 })
 
--- === التحسينات التقنية الخمسة (مدمجة في الدوال أعلاه) ===
--- ✔️ Randomized Delays (في كل FireServer)
--- ✔️ Dynamic Remote Validation (تحقق من وجود الريموت قبل الإرسال)
--- ✔️ Memory-Safe Looping (كل Loop يعتمد على Flag محدّث)
--- ✔️ GUI-Based Stage Detection (في getCurrentStage)
--- ✔️ Auto-Recovery (يمكن توسيعه لاحقًا بـ CharacterAdded إذا لزم)
-
-warn("[kuwaiti] ✅ Exploit suite loaded successfully. Use responsibly.")
+warn("[KUWAITI] ✅ Exploit suite loaded successfully.")
