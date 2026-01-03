@@ -1,63 +1,111 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "KUWAITI HUB | Kick Door Destroyer 🏆",
-   LoadingTitle = "جاري تفعيل أنظمة الإبادة الجماعية...",
+   Name = "KUWAITI HUB V3.5 | ALL-IN-ONE 🚪🔥",
+   LoadingTitle = "جاري تجميع القوى وفتح المسارات...",
+   ConfigurationSaving = { Enabled = false },
    KeySystem = false
 })
 
--- تبويب التجميع الآلي
-local AutoTab = Window:CreateTab("التجميع الشامل 🔄", 4483362458)
+-- متغيرات التحكم
+_G.SmartTrain = false
+_G.SmartWin = false
+_G.SmartRebirth = false
+_G.AutoEgg = false
+_G.TimeBoost = false
 
-AutoTab:CreateToggle({
-   Name = "تمرين تلقائي (Auto Train - Fast)",
+--- [ التبويب الأول: الذكاء والإبادة ] ---
+local MainTab = Window:CreateTab("الذكاء والفتح 🤖", 4483362458)
+
+MainTab:CreateButton({
+   Name = "فتح جميع الأبواب فوراً (Unlock All Doors)",
+   Callback = function()
+       pcall(function()
+           -- تكرار الركل على جميع الأبواب في الماب
+           for i = 1, 50 do -- تكرار لضمان الفتح
+               game:GetService("ReplicatedStorage").Remote.Event.Game:FindFirstChild("[C-S]PlayerClick"):FireServer()
+           end
+           Rayfield:Notify({Title = "يوسف هب", Content = "تم إرسال أوامر فتح الأبواب!", Duration = 3})
+       end)
+   end,
+})
+
+MainTab:CreateToggle({
+   Name = "تمرين ذكي (All Powers 1,2,3)",
    CurrentValue = false,
    Callback = function(Value)
-       _G.AutoTrain = Value
+       _G.SmartTrain = Value
        spawn(function()
-           while _G.AutoTrain do
-               -- استخدام الريموت الذي اصطدته للتمرين المباشر
-               local args = {[1] = workspace.Scripts.Train:FindFirstChild("1").power2}
-               game:GetService("ReplicatedStorage").Remote.Event.Game:FindFirstChild("[C-S]PlayerTryTrain"):FireServer(unpack(args))
-               task.wait(0.01) -- سرعة تمرين جنونية
+           while _G.SmartTrain do
+               pcall(function()
+                   for _, folder in pairs(workspace.Scripts.Train:GetChildren()) do
+                       for _, power in pairs(folder:GetChildren()) do
+                           if power.Name:find("power") then
+                               game:GetService("ReplicatedStorage").Remote.Event.Game:FindFirstChild("[C-S]PlayerTryTrain"):FireServer(power)
+                           end
+                       end
+                   end
+               end)
+               task.wait(0.01)
            end
        end)
    end,
 })
 
-AutoTab:CreateToggle({
+MainTab:CreateToggle({
+   Name = "فوز تلقائي مصلح (Fixed Auto Win)",
+   CurrentValue = false,
+   Callback = function(Value)
+       _G.SmartWin = Value
+       spawn(function()
+           while _G.SmartWin do
+               pcall(function()
+                   -- تفعيل وضع القتال لضمان عمل الفوز
+                   game:GetService("ReplicatedStorage").Remote.Event.Setting:FindFirstChild("[C-S]PlayerTrySet"):FireServer("AutoFight", "1")
+                   task.wait(0.1)
+                   game:GetService("ReplicatedStorage").Remote.Event.Game:FindFirstChild("[C-S]PlayerWin"):FireServer("1")
+               end)
+               task.wait(0.5)
+           end
+       end)
+   end,
+})
+
+--- [ التبويب الثاني: التجميع والريبيرث ] ---
+local FarmTab = Window:CreateTab("التجميع والمال 💰", 4483362458)
+
+FarmTab:CreateToggle({
    Name = "ريبيرث تلقائي (Auto Rebirth)",
    CurrentValue = false,
    Callback = function(Value)
-       _G.AutoRebirth = Value
+       _G.SmartRebirth = Value
        spawn(function()
-           while _G.AutoRebirth do
-               -- ريموت الريبيرث الذي اصطدته
+           while _G.SmartRebirth do
                game:GetService("ReplicatedStorage").Remote.Event.Eco:FindFirstChild("[C-S]PlayerTryRebirth"):FireServer()
-               task.wait(1) -- فحص كل ثانية إذا كنت تستطيع عمل ريبيرث
+               task.wait(2)
            end
        end)
    end,
 })
 
-AutoTab:CreateToggle({
-   Name = "فوز + فلوس تلقائي (Auto Win)",
+FarmTab:CreateToggle({
+   Name = "بوست وقت مجاني (Time Boost)",
    CurrentValue = false,
    Callback = function(Value)
-       _G.AutoWin = Value
+       _G.TimeBoost = Value
        spawn(function()
-           while _G.AutoWin do
-               game:GetService("ReplicatedStorage").Remote.Event.Game:FindFirstChild("[C-S]PlayerWin"):FireServer("1")
-               task.wait(0.1)
+           while _G.TimeBoost do
+               game:GetService("ReplicatedStorage").Remote.Event.Boost:FindFirstChild("[C-S]PlayerTryAddTimeBoost"):FireServer()
+               task.wait(10)
            end
        end)
    end,
 })
 
--- تبويب البتات
-local PetTab = Window:CreateTab("البتات (Pets) 🐾", 4483362458)
+--- [ التبويب الثالث: البتات والأدوات ] ---
+local MiscTab = Window:CreateTab("أدوات إضافية 🛠️", 4483362458)
 
-PetTab:CreateToggle({
+MiscTab:CreateToggle({
    Name = "فتح بيضة Egg3 تلقائياً",
    CurrentValue = false,
    Callback = function(Value)
@@ -72,20 +120,10 @@ PetTab:CreateToggle({
    end,
 })
 
--- تبويب الأدوات
-local MiscTab = Window:CreateTab("أدوات إضافية 🛠️", 4483362458)
-
 MiscTab:CreateButton({
-   Name = "إنهاء التمرين (End Train)",
+   Name = "تجهيز أفضل أداة (3_6)",
    Callback = function()
-       game:GetService("ReplicatedStorage").Remote.Event.Game:FindFirstChild("[C-S]PlayerEndTrain"):FireServer()
-   end,
-})
-
-MiscTab:CreateButton({
-   Name = "أمر الركل (Force Click)",
-   Callback = function()
-       game:GetService("ReplicatedStorage").Remote.Event.Game:FindFirstChild("[C-S]PlayerClick"):FireServer()
+       game:GetService("ReplicatedStorage").Remote.Event.Game:FindFirstChild("[C-S]PlayerTryChangeTrainTool"):FireServer("3_6")
    end,
 })
 
@@ -97,7 +135,7 @@ MiscTab:CreateButton({
 })
 
 Rayfield:Notify({
-   Title = "تم تفعيل يوسف هب",
-   Content = "استمتع بالفلوس والريبيرث اللانهائي!",
+   Title = "Kuwaiti Hub Ready",
+   Content = "تم دمج جميع الأوامر في سكريبت واحد!",
    Duration = 5
 })
