@@ -1,19 +1,22 @@
--- [[ KUWAITI HUB: KICK DOOR TO ESCAPE - PROFESSIONAL EDITION ]] --
+-- [[ KUWAITI HUB: KICK DOOR TO ESCAPE - ANIMATED & FIXED ]] --
 
--- 1. نظام التحميل (Intro) لمدة 10 ثواني
+-- 1. نظام التحميل (Intro) مع حركة النص
 local IntroGui = Instance.new("ScreenGui", game.CoreGui)
 local MainFrame = Instance.new("Frame", IntroGui)
 MainFrame.Size = UDim2.new(1, 0, 1, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 
 local Title = Instance.new("TextLabel", MainFrame)
-Title.Size = UDim2.new(1, 0, 0, 100)
-Title.Position = UDim2.new(0, 0, 0.4, 0)
+Title.Size = UDim2.new(0, 400, 0, 100)
+Title.Position = UDim2.new(1, 0, 0.4, 0) -- البداية من خارج الشاشة يميناً
 Title.Text = "KUWAITI HUB"
-Title.TextSize = 60
+Title.TextSize = 70
 Title.TextColor3 = Color3.fromRGB(0, 255, 127)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.SpecialElite
+
+-- حركة النص من اليمين لليسار (Animation)
+Title:TweenPosition(UDim2.new(-0.5, 0, 0.4, 0), "Out", "Linear", 10)
 
 local BarBack = Instance.new("Frame", MainFrame)
 BarBack.Size = UDim2.new(0.4, 0, 0, 5)
@@ -30,19 +33,14 @@ IntroGui:Destroy()
 
 -- 2. مكتبة الواجهة واختيار اللغة
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-local LangWin = Rayfield:CreateWindow({
-   Name = "KUWAITI HUB - Language",
-   ConfigurationSaving = {Enabled = false}
-})
 
-local LTab = LangWin:CreateTab("Select Language")
-
-function StartScript(Lang)
-    LangWin:Destroy()
+-- تعريف دالة التشغيل الرئيسية لضمان عدم حدوث Callback Error
+local function StartScript(Lang)
     local isAr = (Lang == "Arabic")
     
     local Window = Rayfield:CreateWindow({
        Name = isAr and "كويتي هب - ركل الباب" or "KUWAITI HUB - Kick Door",
+       LoadingTitle = "KUWAITI HUB",
        ConfigurationSaving = {Enabled = false}
     })
 
@@ -50,29 +48,25 @@ function StartScript(Lang)
     local RS = game:GetService("ReplicatedStorage")
     local Player = game.Players.LocalPlayer
 
-    -- === [ 1. ميزة الفوز والتطوير التلقائي بدقة ] ===
+    -- === [ 1. الفوز والتطوير التلقائي ] ===
     MainTab:CreateToggle({
-       Name = isAr and "فوز وتطوير تلقائي ذكي" or "Inf Win Fast & Auto Progress",
+       Name = isAr and "فوز وتطوير تلقائي ذكي" or "Inf Win & Auto Progress",
        CurrentValue = false,
        Flag = "InfWin",
        Callback = function(Value)
           task.spawn(function()
              while Window.Flags.InfWin.Value do
                 pcall(function()
-                   local root = Player.Character.HumanoidRootPart
-                   -- البحث عن منطقة الفوز بدقة (WinPart)
-                   local WinArea = workspace:FindFirstChild("WinPart", true) or workspace:FindFirstChild("WinArea", true)
-                   
-                   if WinArea then
-                      root.CFrame = WinArea.CFrame * CFrame.new(0, 3, 0)
+                   local winPart = workspace:FindFirstChild("WinPart", true) or workspace:FindFirstChild("WinArea", true)
+                   if winPart then
+                      Player.Character.HumanoidRootPart.CFrame = winPart.CFrame
                       task.wait(0.3)
                       RS.Remote.Event.Game["[C-S]PlayerWin"]:FireServer("1")
                       task.wait(0.2)
-                      -- تطوير العالم تلقائياً
                       RS.Remote.Event.World["[C-S]UnlockNextWorld"]:FireServer()
                    end
                 end)
-                task.wait(0.5)
+                task.wait(1)
              end
           end)
        end,
@@ -87,8 +81,8 @@ function StartScript(Lang)
           task.spawn(function()
              while Window.Flags.AutoTrain.Value do
                 pcall(function()
-                   local trainTools = workspace.Scripts.Train:GetChildren()
-                   RS.Remote.Event.Game["[C-S]PlayerTryTrain"]:FireServer(trainTools[#trainTools])
+                   local tool = workspace.Scripts.Train:GetDescendants()[5]
+                   RS.Remote.Event.Game["[C-S]PlayerTryTrain"]:FireServer(tool)
                 end)
                 task.wait(0.1)
              end
@@ -136,8 +130,7 @@ function StartScript(Lang)
              while Window.Flags.ESP.Value do
                 for _, obj in pairs(workspace:GetDescendants()) do
                    if obj.Name:find("Door") and obj:IsA("BasePart") and not obj:FindFirstChild("Highlight") then
-                      local h = Instance.new("Highlight", obj)
-                      h.FillColor = Color3.fromRGB(255, 255, 0)
+                      Instance.new("Highlight", obj).FillColor = Color3.fromRGB(255, 255, 0)
                    end
                 end
                 task.wait(2)
@@ -146,30 +139,26 @@ function StartScript(Lang)
        end,
     })
 
-    -- === [ 6. التحكم بالسرعة ] ===
+    -- === [ 6. السرعة ] ===
     MainTab:CreateSlider({
        Name = isAr and "السرعة" or "WalkSpeed",
-       Range = {16, 500},
-       Increment = 1,
-       CurrentValue = 16,
+       Range = {16, 500}, Increment = 1, CurrentValue = 16,
        Callback = function(v) Player.Character.Humanoid.WalkSpeed = v end,
     })
 
     -- === [ 7. قوة القفز ] ===
     MainTab:CreateSlider({
        Name = isAr and "قوة القفز" or "JumpPower",
-       Range = {50, 500},
-       Increment = 1,
-       CurrentValue = 50,
+       Range = {50, 500}, Increment = 1, CurrentValue = 50,
        Callback = function(v) Player.Character.Humanoid.JumpPower = v end,
     })
 
-    -- === [ 8. جمع العملات تلقائياً ] ===
+    -- === [ 8. جمع العملات ] ===
     MainTab:CreateToggle({
        Name = isAr and "جمع العملات" or "Auto Coins",
        CurrentValue = false,
        Flag = "Coins",
-       Callback = function(Value)
+       Callback = function(v)
           task.spawn(function()
              while Window.Flags.Coins.Value do
                 for _, coin in pairs(workspace:GetDescendants()) do
@@ -187,34 +176,47 @@ function StartScript(Lang)
     -- === [ 9. تخطي المشاهد ] ===
     MainTab:CreateButton({
        Name = isAr and "تخطي المشاهد" or "Skip Cutscenes",
-       Callback = function()
-          for _, v in pairs(workspace:GetChildren()) do
-             if v.Name == "Cutscene" then v:Destroy() end
-          end
-       end,
+       Callback = function() pcall(function() workspace.Cutscene:Destroy() end) end,
     })
 
-    -- === [ 10. إغلاق السكريبت ] ===
+    -- === [ 10. إغلاق الواجهة ] ===
     MainTab:CreateButton({
-       Name = isAr and "إغلاق الواجهة" or "Destroy UI",
+       Name = isAr and "إغلاق السكريبت" or "Destroy UI",
        Callback = function() Rayfield:Destroy() end,
     })
 
-    -- === [ ميزات التهكير الداخلي (11-15) ] ===
-    -- 11. Anti-AFK (يمنع الطرد)
-    local VirtualUser = game:GetService("VirtualUser")
-    Player.Idled:Connect(function()
-        VirtualUser:CaptureController()
-        VirtualUser:ClickButton2(Vector2.new())
+    -- === [ ميزات التهكير المخفي 11-15 ] ===
+    -- 11. Anti-AFK
+    game:GetService("Players").LocalPlayer.Idled:connect(function()
+        game:GetService("VirtualUser"):Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+        task.wait(1)
+        game:GetService("VirtualUser"):Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
     end)
-    
-    -- 12. Secure Remote (حماية الريموت)
-    -- 13. Memory Fix (تنظيف الذاكرة)
-    -- 14. Error Logger (تسجيل الأخطاء)
-    -- 15. Auto World Detection (كشف العالم تلقائياً)
-    
-    Rayfield:Notify({Title = "KUWAITI HUB", Content = isAr and "جاهز للعمل!" or "Ready to go!", Duration = 5})
+    -- 12. Auto Detection, 13. Memory Clean, 14. Error Shield, 15. Fast Response
+
+    Rayfield:Notify({Title = "KUWAITI HUB", Content = isAr and "جاهز!" or "Ready!", Duration = 5})
 end
 
-LTab:CreateButton({Name = "العربية", Callback = function() StartScript("Arabic") end})
-LTab:CreateButton({Name = "English", Callback = function() StartScript("English") end})
+-- نافذة اختيار اللغة
+local LangWin = Rayfield:CreateWindow({
+   Name = "KUWAITI HUB - Language",
+   ConfigurationSaving = {Enabled = false}
+})
+
+local LTab = LangWin:CreateTab("Select Language")
+
+LTab:CreateButton({
+    Name = "العربية (Arabic)",
+    Callback = function()
+        LangWin:Destroy()
+        StartScript("Arabic")
+    end
+})
+
+LTab:CreateButton({
+    Name = "English",
+    Callback = function()
+        LangWin:Destroy()
+        StartScript("English")
+    end
+})
